@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 data class Review(
     val id: ID,
-    val knowhowID: ID,
+    val knowhowId: ID,
     val rate: Int,
     val comment: String?,
     val author: User,
@@ -37,6 +37,6 @@ class ReviewQuery : Query {
 
 @Component
 class ReviewMutation : Mutation {
-    fun addReview(knowhowID: ID, rate: Int, comment: String? = null): Review = TODO("Not yet implemented")
+    fun addReview(knowhowId: ID, rate: Int, comment: String? = null): Review = TODO("Not yet implemented")
     fun updateReview(review: ReviewInput): Review = TODO("Not yet implemented")
 }
