@@ -1,16 +1,14 @@
 package com.moneyforward.ktnowhow.repository
 
-import com.expediagroup.graphql.generator.scalars.ID
-import com.moneyforward.ktnowhow.model.User
-import com.moneyforward.ktnowhow.model.UserInput
-import java.util.*
+import com.moneyforward.ktnowhow.graphql.type.User
+import com.moneyforward.ktnowhow.graphql.type.UserInput
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepositoryImpl : UserRepository {
-    override fun findUser(id: ID): User {
+    override fun findUserBy(id: Long): User? {
         // todo impl とりあえず固定値を返す
-        return User(id = ID(UUID.randomUUID().toString()), name = "TestUser1", iconUrl = null)
+        return User(rawId = id, name = "TestUser$id", iconUrl = null)
     }
 
     override fun createUser(name: String, iconUrl: String?): User {
