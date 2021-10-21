@@ -1,5 +1,6 @@
 package com.moneyforward.ktnowhow.graphql.type
 
+import com.expediagroup.graphql.generator.annotations.GraphQLIgnore
 import com.expediagroup.graphql.generator.scalars.ID
 
 data class Knowhow(
@@ -18,4 +19,9 @@ data class KnowhowInput(
     val title: String,
     val url: String,
     val tagIds: List<ID>?,
-) : LongIdInputType
+) : LongIdInputType {
+
+    @GraphQLIgnore
+    override val rawId: Long?
+        get() = id.getRawId(Knowhow::class)
+}

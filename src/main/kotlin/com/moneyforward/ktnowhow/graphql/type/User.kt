@@ -1,5 +1,6 @@
 package com.moneyforward.ktnowhow.graphql.type
 
+import com.expediagroup.graphql.generator.annotations.GraphQLIgnore
 import com.expediagroup.graphql.generator.scalars.ID
 
 data class User(
@@ -12,4 +13,8 @@ data class UserInput(
     override val id: ID,
     val name: String,
     val iconUrl: String?,
-) : LongIdInputType
+) : LongIdInputType {
+
+    @GraphQLIgnore
+    override val rawId: Long? = id.getRawId(User::class)
+}
