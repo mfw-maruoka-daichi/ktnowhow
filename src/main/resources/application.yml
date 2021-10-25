@@ -1,3 +1,10 @@
 graphql:
   packages:
     - "com.moneyforward.ktnowhow"
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:ktnowhow
+    # url: jdbc:h2:~/.h2/ktnowhow
+    username: sa
+    password:
