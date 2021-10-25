@@ -10,15 +10,15 @@ data class Knowhow(
     // todo CustomScalarは作るとして型は要検討 コード共有前提だとkotlinx.datetimeにしたい(ZonedDateTimeがないのでTimeZoneどうするか)
     // val publicationDate: ZonedDateTime,
     val author: User,
-    val tags: List<Tag>?,
+    val tags: List<Tag>,
     val reviews: List<Review>,
 ) : LongIdType
 
 data class KnowhowInput(
     override val id: ID,
-    val title: String,
-    val url: String,
-    val tagIds: List<ID>?,
+    val title: String? = null,
+    val url: String? = null,
+    val tagIds: List<ID>? = null,
 ) : LongIdInputType {
 
     @GraphQLIgnore

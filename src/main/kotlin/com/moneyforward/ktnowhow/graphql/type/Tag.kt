@@ -10,7 +10,7 @@ data class Tag(
 
 data class TagInput(
     override val id: ID,
-    val name: String,
+    val name: String? = null,
 ) : LongIdInputType {
 
     @GraphQLIgnore

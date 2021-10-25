@@ -11,8 +11,8 @@ data class User(
 
 data class UserInput(
     override val id: ID,
-    val name: String,
-    val iconUrl: String?,
+    val name: String? = null,
+    val iconUrl: String? = null,
 ) : LongIdInputType {
 
     @GraphQLIgnore

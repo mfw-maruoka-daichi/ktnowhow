@@ -13,8 +13,8 @@ data class Review(
 
 data class ReviewInput(
     override val id: ID,
-    val rate: Int,
-    val comment: String?,
+    val rate: Int? = null,
+    val comment: String? = null,
 ) : LongIdInputType {
 
     @GraphQLIgnore
