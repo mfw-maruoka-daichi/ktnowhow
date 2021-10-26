@@ -6,9 +6,12 @@ import com.moneyforward.ktnowhow.graphql.type.User
 import com.moneyforward.ktnowhow.graphql.type.UserInput
 import com.moneyforward.ktnowhow.repository.UserRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserServiceImpl(private val userRepository: UserRepository) : UserService, LongIdTypeFeature {
+
+    @Transactional
     override fun findUserBy(id: ID): User? {
         val rawId = id.getRawId(User::class) ?: throw IllegalArgumentException("todo validation error")
         return userRepository.findUserBy(rawId)
