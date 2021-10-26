@@ -2,7 +2,7 @@ package com.moneyforward.ktnowhow.graphql.type
 
 import com.expediagroup.graphql.generator.annotations.GraphQLIgnore
 import com.expediagroup.graphql.generator.scalars.ID
-import com.moneyforward.ktnowhow.extention.LongIdTypeFeature
+import com.moneyforward.ktnowhow.graphql.extention.LongIdTypeFeature
 
 @GraphQLIgnore
 interface LongIdType : Type, LongIdTypeFeature {

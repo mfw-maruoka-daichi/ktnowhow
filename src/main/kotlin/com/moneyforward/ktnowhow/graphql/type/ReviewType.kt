@@ -1,22 +1,25 @@
 package com.moneyforward.ktnowhow.graphql.type
 
 import com.expediagroup.graphql.generator.annotations.GraphQLIgnore
+import com.expediagroup.graphql.generator.annotations.GraphQLName
 import com.expediagroup.graphql.generator.scalars.ID
 
-data class Review(
+@GraphQLName("Review")
+data class ReviewType(
     override val rawId: Long,
     val knowhowId: ID,
     val rate: Int,
     val comment: String?,
-    val author: User,
+    val author: UserType,
 ) : LongIdType
 
-data class ReviewInput(
+@GraphQLName("ReviewInput")
+data class ReviewInputType(
     override val id: ID,
     val rate: Int? = null,
     val comment: String? = null,
 ) : LongIdInputType {
 
     @GraphQLIgnore
-    override val rawId: Long? = id.getRawId(Review::class)
+    override val rawId: Long? = id.getRawId(ReviewType::class)
 }

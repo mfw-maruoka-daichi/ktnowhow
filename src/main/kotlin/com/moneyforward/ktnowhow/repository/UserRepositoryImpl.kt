@@ -1,14 +1,23 @@
 package com.moneyforward.ktnowhow.repository
 
-import com.moneyforward.ktnowhow.graphql.type.User
-import com.moneyforward.ktnowhow.graphql.type.UserInput
+import com.moneyforward.ktnowhow.db.entity.UserEntity
+import com.moneyforward.ktnowhow.db.table.Users
+import com.moneyforward.ktnowhow.model.User
+import com.moneyforward.ktnowhow.model.UserInput
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepositoryImpl : UserRepository {
     override fun findUserBy(id: Long): User? {
-        // todo impl とりあえず固定値を返す
-        return User(rawId = id, name = "TestUser$id", iconUrl = null)
+        val userByDsl = Users.select { Users.id eq id }.singleOrNull()?.toUser()
+        println("DSL User:$userByDsl")
+
+        val userByDao = UserEntity.findById(id)?.toUser()
+        println("DAO User:$userByDao")
+
+        return userByDao
     }
 
     override fun createUser(name: String, iconUrl: String?): User {
@@ -18,4 +27,16 @@ class UserRepositoryImpl : UserRepository {
     override fun updateUser(user: UserInput): User {
         TODO("Not yet implemented")
     }
+
+    private fun ResultRow.toUser(): User = User(
+        id = this[Users.id].value,
+        name = this[Users.name],
+        iconUrl = this[Users.iconUrl],
+    )
+
+    private fun UserEntity.toUser(): User = User(
+        id = id.value,
+        name = name,
+        iconUrl = iconUrl,
+    )
 }

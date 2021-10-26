@@ -5,8 +5,8 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 
-class Tag(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<Tag>(Tags)
+class TagEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<TagEntity>(Tags)
 
     var name: String by Tags.name
 }
