@@ -28,6 +28,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.expediagroup:graphql-kotlin-spring-server:$graphqlKotlinVersion")
     implementation("org.flywaydb:flyway-core")
+    implementation("com.h2database:h2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
