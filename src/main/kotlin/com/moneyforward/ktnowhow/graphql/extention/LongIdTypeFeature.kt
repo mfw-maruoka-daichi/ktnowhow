@@ -11,7 +11,13 @@ interface LongIdTypeFeature {
     private val idDelimiter: String
         get() = ":"
 
-    fun Long.toID(clazz: KClass<out LongIdType>): ID = ID("${clazz.simpleName}$idDelimiter$this")
+    private val KClass<out LongIdType>.graphqlTypeName: String?
+        get() = (annotations.find { it.annotationClass == GraphQLName::class } as? GraphQLName)?.value ?: simpleName
+
+    fun Long.toID(clazz: KClass<out LongIdType>): ID? =
+        clazz.graphqlTypeName?.let {
+            ID("$it$idDelimiter$this")
+        }
 
     fun ID.getRawId(clazz: KClass<out LongIdType>): Long? {
         val (prefix, rawId) = value.split(idDelimiter).let {
@@ -19,10 +25,6 @@ interface LongIdTypeFeature {
             it.first() to it.last()
         }
 
-        val graphqlTypeName =
-            (clazz.annotations.find { it.annotationClass == GraphQLName::class } as? GraphQLName)?.value
-                ?: clazz.simpleName
-
-        return if (prefix != graphqlTypeName) null else rawId.toLongOrNull()
+        return if (prefix == clazz.graphqlTypeName) rawId.toLongOrNull() else null
     }
 }
