@@ -5,23 +5,37 @@ import com.moneyforward.ktnowhow.db.table.Users
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.model.UserInput
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepositoryImpl : UserRepository {
     override fun findUserBy(id: Long): User? {
-        val userByDsl = Users.select { Users.id eq id }.singleOrNull()?.toUser()
-        println("DSL User:$userByDsl")
+//        val userByDsl = Users.select { Users.id eq id }.singleOrNull()?.toUser()
+//        println("Find user: $userByDsl")
 
-        val userByDao = UserEntity.findById(id)?.toUser()
-        println("DAO User:$userByDao")
+        val user = UserEntity.findById(id)?.toUser()
+        println("Find user: $user")
 
-        return userByDao
+        return user
     }
 
     override fun createUser(name: String, iconUrl: String?): User {
-        TODO("Not yet implemented")
+//        val newUserByDsl = Users.insert {
+//            it[Users.name] = name
+//            it[Users.iconUrl] = iconUrl
+//        }.resultedValues?.singleOrNull()?.toUser()
+//        println("Create user: $newUserByDsl")
+//        requireNotNull(newUserByDsl){"なんでinsertの結果取得でnullチェックいるん？"}
+//
+//        return newUserByDsl.toUser()
+
+        val newUser = UserEntity.new {
+            this.name = name
+            this.iconUrl = iconUrl
+        }
+        println("Create user: $newUser")
+
+        return newUser.toUser()
     }
 
     override fun updateUser(user: UserInput): User {

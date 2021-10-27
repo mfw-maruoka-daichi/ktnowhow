@@ -19,8 +19,10 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService,
         return userRepository.findUserBy(rawId)?.toUserType()
     }
 
+    @Transactional
     override fun createUser(name: String, iconUrl: String?): UserType {
-        TODO("Not yet implemented")
+        // todo validation
+        return userRepository.createUser(name, iconUrl).toUserType()
     }
 
     override fun updateUser(user: UserInputType): UserType {
