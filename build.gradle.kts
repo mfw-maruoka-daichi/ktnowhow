@@ -16,16 +16,22 @@ repositories {
 }
 
 val graphqlKotlinVersion = "5.1.1"
+val exposedVersion = "0.35.3"
+val h2Version = "1.4.200"
+val hikariCpVersion = "5.0.0"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.expediagroup:graphql-kotlin-spring-server:$graphqlKotlinVersion")
     implementation("org.flywaydb:flyway-core")
+    implementation("com.h2database:h2:$h2Version")
+    implementation("com.zaxxer:HikariCP:$hikariCpVersion")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
