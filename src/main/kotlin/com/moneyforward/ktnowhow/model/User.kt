@@ -7,6 +7,7 @@ data class User(
 )
 
 data class UserInput(
+    val id: Long,
     val name: String?,
     val iconUrl: String?,
 )

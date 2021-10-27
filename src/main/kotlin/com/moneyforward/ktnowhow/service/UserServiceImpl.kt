@@ -15,7 +15,8 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService,
 
     @Transactional
     override fun findUserBy(id: ID): UserType? {
-        val rawId = id.getRawId(UserType::class) ?: throw IllegalArgumentException("todo validation error")
+        val rawId = id.getRawId(UserType::class)
+            ?: throw IllegalArgumentException("todo validation error")
         return userRepository.findUserBy(rawId)?.toUserType()
     }
 
@@ -25,8 +26,11 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService,
         return userRepository.createUser(name, iconUrl).toUserType()
     }
 
+    @Transactional
     override fun updateUser(user: UserInputType): UserType {
-        TODO("Not yet implemented")
+        // todo validation
+        return userRepository.updateUser(user.toUserInput())?.toUserType()
+            ?: throw IllegalArgumentException("target not found")
     }
 
     private fun User.toUserType(): UserType =
@@ -38,6 +42,7 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService,
 
     private fun UserInputType.toUserInput(): UserInput =
         UserInput(
+            id = rawId ?: throw IllegalArgumentException("todo validation error"),
             name = name,
             iconUrl = iconUrl,
         )

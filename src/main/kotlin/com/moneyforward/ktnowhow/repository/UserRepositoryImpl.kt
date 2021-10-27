@@ -10,13 +10,9 @@ import org.springframework.stereotype.Repository
 @Repository
 class UserRepositoryImpl : UserRepository {
     override fun findUserBy(id: Long): User? {
-//        val userByDsl = Users.select { Users.id eq id }.singleOrNull()?.toUser()
-//        println("Find user: $userByDsl")
+//        return Users.select { Users.id eq id }.singleOrNull()?.toUser()
 
-        val user = UserEntity.findById(id)?.toUser()
-        println("Find user: $user")
-
-        return user
+        return UserEntity.findById(id)?.toUser()
     }
 
     override fun createUser(name: String, iconUrl: String?): User {
@@ -24,22 +20,30 @@ class UserRepositoryImpl : UserRepository {
 //            it[Users.name] = name
 //            it[Users.iconUrl] = iconUrl
 //        }.resultedValues?.singleOrNull()?.toUser()
-//        println("Create user: $newUserByDsl")
 //        requireNotNull(newUserByDsl){"なんでinsertの結果取得でnullチェックいるん？"}
 //
 //        return newUserByDsl.toUser()
 
-        val newUser = UserEntity.new {
+        return UserEntity.new {
             this.name = name
             this.iconUrl = iconUrl
-        }
-        println("Create user: $newUser")
-
-        return newUser.toUser()
+        }.toUser()
     }
 
-    override fun updateUser(user: UserInput): User {
-        TODO("Not yet implemented")
+    override fun updateUser(user: UserInput): User? {
+//        // update対象行数を返す
+//        Users.update({ Users.id eq user.id }) {
+//            // itでカラム指定しなければならないので、letでitが使えない
+//            // with(user){}としたいが、tableと変数名が被るのでuser.fooとしたほうがタイプ数少ない
+//            user.name?.let { newName -> it[name] = newName }
+//            user.iconUrl?.let { newIconUrl -> it[iconUrl] = newIconUrl }
+//        }
+//        return findUserBy(user.id)
+
+        return UserEntity.findById(user.id)?.apply {
+            user.name?.let { name = it }
+            user.iconUrl?.let { iconUrl = it }
+        }?.toUser()
     }
 
     private fun ResultRow.toUser(): User = User(
