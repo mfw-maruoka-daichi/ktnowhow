@@ -8,7 +8,7 @@
   - GraphQL Kotlinでktorも使えるが、スキーマ生成のFunctionを実装する必要がある
     - Springならアノテーションで自動生成
 - [ ] Auth: Spring Security
-- [ ] ORM: Exposed(DBはMySQL)
+- [x] ORM: Exposed(DBは~~MySQL~~H2)
   - KotlinのものでKtorm以外のを
 - [ ] Test: Kotest + MockK
   - JUnitは書けることわかっているので
