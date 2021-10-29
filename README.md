@@ -15,7 +15,7 @@
   - mockitoはAndroidのプロジェクトで使っているので
 - [ ] Lint: detekt
   - ktlintはAndroidのプロジェクトで使っているので
-- [ ] validation: konform
+- [x] validation: konform
   - これのほうがKotlinっぽい書き方できるので
   - Kotestと連携できるのも良さそう https://github.com/kotest/kotest-assertions-konform
 - [x] serialize: ~~kotlinx.serialization~~jackson
