@@ -20,6 +20,7 @@ val exposedVersion = "0.35.3"
 val h2Version = "1.4.200"
 val hikariCpVersion = "5.0.0"
 val konformVersion = "0.3.0"
+val kotestVersion = "4.6.3"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -39,6 +40,9 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
 tasks.withType<KotlinCompile> {
