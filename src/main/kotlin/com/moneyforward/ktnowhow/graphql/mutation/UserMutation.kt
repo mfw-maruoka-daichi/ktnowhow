@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserMutation(private val userService: UserService) : Mutation {
-    @Deprecated("")
     fun createUser(name: String, iconUrl: String? = null): UserType = userService.createUser(name, iconUrl)
     fun updateUser(user: UserInputType): UserType = userService.updateUser(user)
 }
