@@ -23,7 +23,7 @@ class LongIdTypeFeatureTest : LongIdTypeFeature, FunSpec() {
                 }
             }
             context("getRawId") {
-                test("from  annotated type ID") {
+                test("from annotated type ID") {
                     ID("Annotated:1").getRawId(AnnotatedType::class).shouldBe(1L)
                 }
                 test("from non annotated type ID") {
