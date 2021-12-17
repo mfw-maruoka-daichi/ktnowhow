@@ -1,7 +1,7 @@
 package com.moneyforward.ktnowhow.service
 
 import com.expediagroup.graphql.generator.scalars.ID
-import com.moneyforward.ktnowhow.graphql.extention.LongIdTypeFeature
+import com.moneyforward.ktnowhow.graphql.extention.id.getRawId
 import com.moneyforward.ktnowhow.graphql.type.UserInputType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository
-) : UserService, LongIdTypeFeature, UserValidation {
+) : UserService, UserValidation {
 
     @Transactional
     override fun findUserBy(id: ID): UserType? {
