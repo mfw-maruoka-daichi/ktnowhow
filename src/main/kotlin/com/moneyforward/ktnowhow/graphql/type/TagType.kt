@@ -3,6 +3,7 @@ package com.moneyforward.ktnowhow.graphql.type
 import com.expediagroup.graphql.generator.annotations.GraphQLIgnore
 import com.expediagroup.graphql.generator.annotations.GraphQLName
 import com.expediagroup.graphql.generator.scalars.ID
+import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 
 @GraphQLName("Tag")
 data class TagType(
