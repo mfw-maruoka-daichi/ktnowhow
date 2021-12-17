@@ -2,8 +2,6 @@ package com.moneyforward.ktnowhow.graphql.extension.id
 
 import com.expediagroup.graphql.generator.annotations.GraphQLName
 import com.expediagroup.graphql.generator.scalars.ID
-import com.moneyforward.ktnowhow.graphql.extention.id.getRawId
-import com.moneyforward.ktnowhow.graphql.extention.id.toID
 import com.moneyforward.ktnowhow.graphql.type.LongIdType
 import graphql.relay.Relay
 import io.kotest.core.spec.style.FunSpec

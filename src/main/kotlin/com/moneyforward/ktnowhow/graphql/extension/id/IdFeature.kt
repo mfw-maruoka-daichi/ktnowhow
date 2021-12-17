@@ -1,4 +1,4 @@
-package com.moneyforward.ktnowhow.graphql.extention.id
+package com.moneyforward.ktnowhow.graphql.extension.id
 
 import com.expediagroup.graphql.generator.annotations.GraphQLName
 import com.expediagroup.graphql.generator.scalars.ID

@@ -1,7 +1,7 @@
 package com.moneyforward.ktnowhow.service
 
 import com.expediagroup.graphql.generator.scalars.ID
-import com.moneyforward.ktnowhow.graphql.extention.id.getRawId
+import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 import com.moneyforward.ktnowhow.graphql.type.UserInputType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
