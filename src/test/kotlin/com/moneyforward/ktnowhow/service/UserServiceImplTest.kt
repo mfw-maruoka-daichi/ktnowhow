@@ -1,31 +1,17 @@
 package com.moneyforward.ktnowhow.service
 
 import com.expediagroup.graphql.generator.scalars.ID
-import com.moneyforward.ktnowhow.db.H2TestDatabase
-import com.moneyforward.ktnowhow.db.table.Users
 import com.moneyforward.ktnowhow.graphql.type.UserInputType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.repository.UserRepository
 import io.kotest.assertions.throwables.shouldThrowExactly
-import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserServiceImplTest : ExpectSpec() {
-
-    override fun beforeSpec(spec: Spec) {
-        H2TestDatabase.connect()
-        transaction {
-            SchemaUtils.create(Users)
-        }
-
-        super.beforeSpec(spec)
-    }
 
     private val userType1 = UserType(1L, "sample1", null)
     private val userType2 = UserType(2L, "sample2", null)
