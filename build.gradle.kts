@@ -21,6 +21,7 @@ val h2Version = "1.4.200"
 val hikariCpVersion = "5.0.0"
 val konformVersion = "0.3.0"
 val kotestVersion = "4.6.3"
+val mockkVersion = "1.12.1"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -43,6 +44,7 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
 }
 
 tasks.withType<KotlinCompile> {
