@@ -9,5 +9,7 @@ import org.springframework.stereotype.Component
 class ReviewQuery : Query {
     fun findReviewById(id: ID): ReviewType? = TODO("Not yet implemented")
     fun findReviewByKnowhowId(knowhowId: ID): List<ReviewType> = TODO("Not yet implemented")
+
+    // todo lower or upper (実需要的にはupperだけでいい)
     fun findReviewByRate(rate: Int): List<ReviewType> = TODO("Not yet implemented")
 }

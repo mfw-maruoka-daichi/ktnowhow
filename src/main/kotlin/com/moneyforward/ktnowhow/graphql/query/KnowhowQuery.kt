@@ -11,4 +11,5 @@ class KnowhowQuery : Query {
     fun findKnowhowById(id: ID): KnowhowType? = TODO("Not yet implemented")
     fun findKnowhowByTitle(title: String): List<KnowhowType> = TODO("Not yet implemented")
     fun findKnowhowByTags(tagIds: List<ID>): List<KnowhowType> = TODO("Not yet implemented")
+    fun findKnowhowByAuthor(authorID: ID): List<KnowhowType> = TODO("Not yet implemented")
 }

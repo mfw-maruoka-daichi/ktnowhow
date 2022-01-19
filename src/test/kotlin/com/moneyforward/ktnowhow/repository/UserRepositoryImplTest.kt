@@ -28,11 +28,6 @@ class UserRepositoryImplTest : ExpectSpec() {
 
     init {
         context("normal") {
-            expect("user not found") {
-                transaction {
-                    userRepository.findUserBy(1L) shouldBe null
-                }
-            }
             expect("create user") {
                 transaction {
                     userRepository.createUser("sampleUser") shouldBe User(1L, "sampleUser", null)
@@ -61,6 +56,21 @@ class UserRepositoryImplTest : ExpectSpec() {
             expect("user not found on update") {
                 transaction {
                     userRepository.updateUser(UserInput(2L, "", null)) shouldBe null
+                }
+            }
+            expect("user not found on delete") {
+                transaction {
+                    userRepository.deleteUser(2L) shouldBe null
+                }
+            }
+            expect("delete user") {
+                transaction {
+                    userRepository.deleteUser(1L) shouldBe 1L
+                }
+            }
+            expect("user not found") {
+                transaction {
+                    userRepository.findUserBy(1L) shouldBe null
                 }
             }
         }

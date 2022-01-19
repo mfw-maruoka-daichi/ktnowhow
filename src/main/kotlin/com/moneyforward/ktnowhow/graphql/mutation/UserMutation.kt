@@ -1,5 +1,6 @@
 package com.moneyforward.ktnowhow.graphql.mutation
 
+import com.expediagroup.graphql.generator.scalars.ID
 import com.expediagroup.graphql.server.operations.Mutation
 import com.moneyforward.ktnowhow.graphql.type.UserInputType
 import com.moneyforward.ktnowhow.graphql.type.UserType
@@ -10,4 +11,5 @@ import org.springframework.stereotype.Component
 class UserMutation(private val userService: UserService) : Mutation {
     fun createUser(name: String, iconUrl: String? = null): UserType = userService.createUser(name, iconUrl)
     fun updateUser(user: UserInputType): UserType = userService.updateUser(user)
+    fun deleteUser(id: ID): ID = userService.deleteUser(id)
 }

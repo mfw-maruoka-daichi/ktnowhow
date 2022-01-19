@@ -8,5 +8,5 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserQuery(private val userService: UserService) : Query {
-    fun findUserById(id: ID): UserType? = userService.findUserBy(id)
+    fun findUserById(id: ID): UserType? = userService.findUserById(id)
 }

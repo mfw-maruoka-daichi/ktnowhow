@@ -22,6 +22,11 @@ class UserRepositoryImpl : UserRepository {
             user.iconUrl?.let { iconUrl = it }
         }?.toUser()
 
+    override fun deleteUser(id: Long): Long? =
+        UserEntity.findById(id)?.apply {
+            delete()
+        }?.id?.value
+
     private fun UserEntity.toUser(): User = User(
         id = id.value,
         name = name,

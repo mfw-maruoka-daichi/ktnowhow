@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component
 class ReviewMutation : Mutation {
     fun addReview(knowhowId: ID, rate: Int, comment: String? = null): ReviewType = TODO("Not yet implemented")
     fun updateReview(review: ReviewInputType): ReviewType = TODO("Not yet implemented")
+    fun deleteReview(reviewID: ID): ID = TODO("Not yet implemented")
 }

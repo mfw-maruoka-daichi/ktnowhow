@@ -2,6 +2,7 @@ package com.moneyforward.ktnowhow.service
 
 import com.expediagroup.graphql.generator.scalars.ID
 import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
+import com.moneyforward.ktnowhow.graphql.extension.id.toID
 import com.moneyforward.ktnowhow.graphql.type.UserInputType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
@@ -17,26 +18,29 @@ class UserServiceImpl(
 ) : UserService, UserValidation {
 
     @Transactional
-    override fun findUserBy(id: ID): UserType? {
-        val rawId = id.getRawId(UserType::class)
-            ?: throw IllegalArgumentException(".rawId is required")
-
+    override fun findUserById(id: ID): UserType? {
+        val rawId = id.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid ID")
         return userRepository.findUserBy(rawId)?.toUserType()
     }
 
     @Transactional
     override fun createUser(name: String, iconUrl: String?): UserType {
         validateUserProperty(name, iconUrl)
-
         return userRepository.createUser(name, iconUrl).toUserType()
     }
 
     @Transactional
     override fun updateUser(user: UserInputType): UserType {
         user.validate()
-
         return userRepository.updateUser(user.toUserInput())?.toUserType()
-            ?: throw IllegalArgumentException("${user.id} not found")
+            ?: throw IllegalStateException("${user.id} not found")
+    }
+
+    @Transactional
+    override fun deleteUser(id: ID): ID {
+        val rawId = id.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid ID")
+        return userRepository.deleteUser(rawId)?.toID(UserType::class)
+            ?: throw IllegalStateException("$id not found")
     }
 
     private fun User.toUserType(): UserType =
@@ -48,7 +52,7 @@ class UserServiceImpl(
 
     private fun UserInputType.toUserInput(): UserInput =
         UserInput(
-            id = rawId ?: throw IllegalArgumentException(".rawId is required"),
+            id = rawId ?: throw IllegalArgumentException("invalid ID"),
             name = name,
             iconUrl = iconUrl,
         )

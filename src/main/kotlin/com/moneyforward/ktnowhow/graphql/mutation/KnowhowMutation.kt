@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component
 class KnowhowMutation : Mutation {
     fun addKnowhow(title: String, url: String, tagIds: List<ID>? = null): KnowhowType = TODO("Not yet implemented")
     fun updateKnowhow(knowhow: KnowhowInputType): KnowhowType = TODO("Not yet implemented")
+    fun deleteKnowhow(knowhowId: ID): ID = TODO("Not yet implemented")
 }
