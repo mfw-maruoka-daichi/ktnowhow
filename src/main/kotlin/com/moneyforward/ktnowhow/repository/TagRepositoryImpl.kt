@@ -7,10 +7,10 @@ import org.springframework.stereotype.Repository
 @Repository
 class TagRepositoryImpl : TagRepository {
     override fun getAll(): List<Tag> = TagEntity.all().map { it.toTag() }
-
-    private fun TagEntity.toTag() =
-        Tag(
-            id = id.value,
-            name = name
-        )
 }
+
+fun TagEntity.toTag(): Tag =
+    Tag(
+        id = id.value,
+        name = name
+    )

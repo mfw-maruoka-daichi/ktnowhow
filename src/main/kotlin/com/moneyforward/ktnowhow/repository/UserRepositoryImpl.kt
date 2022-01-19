@@ -26,10 +26,10 @@ class UserRepositoryImpl : UserRepository {
         UserEntity.findById(id)?.apply {
             delete()
         }?.id?.value
-
-    private fun UserEntity.toUser(): User = User(
-        id = id.value,
-        name = name,
-        iconUrl = iconUrl,
-    )
 }
+
+fun UserEntity.toUser(): User = User(
+    id = id.value,
+    name = name,
+    iconUrl = iconUrl,
+)

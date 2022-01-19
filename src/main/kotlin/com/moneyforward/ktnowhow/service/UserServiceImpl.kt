@@ -43,13 +43,6 @@ class UserServiceImpl(
             ?: throw IllegalStateException("$id not found")
     }
 
-    private fun User.toUserType(): UserType =
-        UserType(
-            rawId = id,
-            name = name,
-            iconUrl = iconUrl,
-        )
-
     private fun UserInputType.toUserInput(): UserInput =
         UserInput(
             id = rawId ?: throw IllegalArgumentException("invalid ID"),
@@ -57,3 +50,10 @@ class UserServiceImpl(
             iconUrl = iconUrl,
         )
 }
+
+fun User.toUserType(): UserType =
+    UserType(
+        rawId = id,
+        name = name,
+        iconUrl = iconUrl,
+    )

@@ -13,10 +13,10 @@ class TagServiceImpl(
 
     @Transactional
     override fun getAllTags(): List<TagType> = tagRepository.getAll().map { it.toTagType() }
-
-    private fun Tag.toTagType(): TagType =
-        TagType(
-            rawId = id,
-            name = name
-        )
 }
+
+fun Tag.toTagType(): TagType =
+    TagType(
+        rawId = id,
+        name = name
+    )
