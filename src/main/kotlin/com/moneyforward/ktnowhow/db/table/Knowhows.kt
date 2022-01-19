@@ -6,6 +6,10 @@ import org.jetbrains.exposed.sql.ReferenceOption
 object Knowhows : LongIdTable("knowhows") {
     val title = varchar("title", 50)
     val url = varchar("url", 2000)
-    val authorId = long("author_id").index("idx_author_id")
-        .references(Users.id, onUpdate = ReferenceOption.CASCADE, onDelete = ReferenceOption.CASCADE)
+
+    // referenceじゃないとダメらしい https://github.com/JetBrains/Exposed/issues/1141
+    // Column<EntityID<>>で定義されないとダメっぽい
+    val authorId =
+        reference("author_id", Users.id, onUpdate = ReferenceOption.CASCADE, onDelete = ReferenceOption.CASCADE)
+            .index("idx_author_id")
 }
