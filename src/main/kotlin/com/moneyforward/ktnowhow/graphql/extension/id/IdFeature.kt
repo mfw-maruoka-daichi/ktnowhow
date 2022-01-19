@@ -6,11 +6,13 @@ import com.moneyforward.ktnowhow.graphql.type.LongIdType
 import graphql.relay.Relay
 import kotlin.reflect.KClass
 
-private val KClass<out LongIdType>.graphqlTypeName: String?
-    get() = (annotations.find { it.annotationClass == GraphQLName::class } as? GraphQLName)?.value ?: simpleName
+private val KClass<out LongIdType>.graphqlTypeName: String
+    // simpleNameがnull = 無名クラス には使用させない
+    get() = requireNotNull(
+        (annotations.find { it.annotationClass == GraphQLName::class } as? GraphQLName)?.value ?: simpleName
+    )
 
-fun Long.toID(clazz: KClass<out LongIdType>): ID? =
-    clazz.graphqlTypeName?.let { ID(Relay().toGlobalId(it, "$this")) }
+fun Long.toID(clazz: KClass<out LongIdType>): ID = ID(Relay().toGlobalId(clazz.graphqlTypeName, "$this"))
 
 fun ID.getRawId(clazz: KClass<out LongIdType>): Long? {
     val (typeName, rawId) =

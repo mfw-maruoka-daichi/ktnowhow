@@ -7,7 +7,7 @@ import com.moneyforward.ktnowhow.graphql.extension.id.toID
 @GraphQLIgnore
 interface LongIdType : Type {
     override val id: ID
-        get() = requireNotNull(rawId.toID(this::class))
+        get() = rawId.toID(this::class)
 
     @GraphQLIgnore
     val rawId: Long
