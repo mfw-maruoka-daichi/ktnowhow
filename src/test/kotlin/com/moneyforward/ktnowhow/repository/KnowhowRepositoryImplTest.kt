@@ -15,7 +15,7 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
 
     // todo ProjectConfigか何かでやる
     override fun beforeSpec(spec: Spec) {
-        H2TestDatabase.connect()
+        H2TestDatabase.connect() // todo ProjectConfigか何かでやる
         transaction {
             SchemaUtils.create(Users)
             SchemaUtils.create(Tags)
@@ -26,6 +26,18 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
         super.beforeSpec(spec)
     }
 
+    override fun afterSpec(spec: Spec) {
+        transaction {
+            // 外部キー定義しているのでdrop順に注意
+            SchemaUtils.drop(KnowhowsTags)
+            SchemaUtils.drop(Tags)
+            SchemaUtils.drop(Knowhows)
+            SchemaUtils.drop(Users)
+        }
+
+        super.afterSpec(spec)
+    }
+
     private val userRepository = UserRepositoryImpl()
     private val tagRepository = TagRepositoryImpl()
     private val knowhowRepository = KnowhowRepositoryImpl()
@@ -34,14 +46,21 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
         describe("add knowhow") {
             it("success") {
                 val author = transaction { userRepository.createUser("user1") }
+                val tags = transaction { tagRepository.createTags(listOf("tag1", "tag2", "tag3")) }
 
-                transaction {
+                val knowhow = transaction {
                     knowhowRepository.addKnowhow(
                         "Knowhow sample",
                         "dummy URL",
                         author.id,
-                        null
-                    ).title shouldBe "Knowhow sample"
+                        tags.map { it.id }
+                    )
+                }
+
+                knowhow.let {
+                    it.title shouldBe "Knowhow sample"
+                    it.author.name shouldBe author.name
+                    it.tags.size shouldBe 3
                 }
             }
         }

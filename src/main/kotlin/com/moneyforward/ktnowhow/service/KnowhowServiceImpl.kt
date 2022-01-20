@@ -41,7 +41,7 @@ class KnowhowServiceImpl(
 
         val tagRawIds = tagIds?.map {
             it.getRawId(TagType::class) ?: throw IllegalArgumentException("invalid tag ID: $it")
-        }
+        } ?: emptyList()
 
         return knowhowRepository.addKnowhow(title, url, authorRawId, tagRawIds).toKnowhowType()
     }
