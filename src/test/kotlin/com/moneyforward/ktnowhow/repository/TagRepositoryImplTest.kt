@@ -1,7 +1,6 @@
 package com.moneyforward.ktnowhow.repository
 
 import com.moneyforward.ktnowhow.db.H2TestDatabase
-import com.moneyforward.ktnowhow.db.entity.TagEntity
 import com.moneyforward.ktnowhow.db.table.Tags
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.DescribeSpec
@@ -12,14 +11,20 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class TagRepositoryImplTest : DescribeSpec() {
 
-    // todo ProjectConfigか何かでやる
     override fun beforeSpec(spec: Spec) {
-        H2TestDatabase.connect()
+        H2TestDatabase.connect() // todo ProjectConfigか何かでやる?
         transaction {
             SchemaUtils.create(Tags)
         }
 
         super.beforeSpec(spec)
+    }
+
+    override fun afterSpec(spec: Spec) {
+        transaction {
+            SchemaUtils.drop(Tags)
+        }
+        super.afterSpec(spec)
     }
 
     private val tagRepository = TagRepositoryImpl()
@@ -31,15 +36,22 @@ class TagRepositoryImplTest : DescribeSpec() {
                     tagRepository.getAll().shouldBeEmpty()
                 }
             }
+            it("create one") {
+                transaction {
+                    tagRepository.createTag(name = "tag1").name shouldBe "tag1"
+                }
+            }
+            it("create multiple") {
+                transaction {
+                    tagRepository.createTags(listOf("tag2", "tag3")).let {
+                        it.size shouldBe 2
+                        it.first().name shouldBe "tag2"
+                        it.last().name shouldBe "tag3"
+                    }
+                }
+            }
             it("exists") {
-                transaction {
-                    TagEntity.new { name = "tag1" }
-                    TagEntity.new { name = "tag2" }
-                    TagEntity.new { name = "tag3" }
-                }
-                transaction {
-                    tagRepository.getAll().size shouldBe 3
-                }
+                transaction { tagRepository.getAll() }.size shouldBe 3
             }
         }
     }
