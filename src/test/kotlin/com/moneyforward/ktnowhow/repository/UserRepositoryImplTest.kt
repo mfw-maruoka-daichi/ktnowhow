@@ -14,14 +14,20 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepositoryImplTest : ExpectSpec() {
 
-    // todo ProjectConfigか何かでやる
     override fun beforeSpec(spec: Spec) {
-        H2TestDatabase.connect()
+        H2TestDatabase.connect() // todo ProjectConfigか何かでやる?
         transaction {
             SchemaUtils.create(Users)
         }
 
         super.beforeSpec(spec)
+    }
+
+    override fun afterSpec(spec: Spec) {
+        transaction {
+            SchemaUtils.drop(Users)
+        }
+        super.afterSpec(spec)
     }
 
     private val userRepository = UserRepositoryImpl()
