@@ -84,6 +84,18 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
                             }
                         }
                     }
+                    it("when tags include tag witch does not exists") {
+                        transaction {
+                            shouldThrow<EntityNotFoundException> {
+                                knowhowRepository.addKnowhow(
+                                    "Knowhow sample",
+                                    "dummy URL",
+                                    author.id,
+                                    tags.map { it.id } + 4
+                                )
+                            }
+                        }
+                    }
                 }
             }
             it("exist") {
