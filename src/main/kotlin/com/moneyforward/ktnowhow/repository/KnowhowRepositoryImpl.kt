@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 class KnowhowRepositoryImpl : KnowhowRepository {
     override fun getAll(): List<Knowhow> = KnowhowEntity.all().map { it.toKnowhow() }
 
-    override fun addKnowhow(title: String, url: String, authorId: Long, tags: List<Long>): Knowhow {
+    override fun addKnowhow(title: String, url: String, authorId: Long, tagIds: List<Long>): Knowhow {
         val knowhowEntity = KnowhowEntity.new {
             this.title = title
             this.url = url
@@ -19,7 +19,7 @@ class KnowhowRepositoryImpl : KnowhowRepository {
 
         // knowhowEntityを一度insertしたあとにtagsに設定しないと、Knowhows.idが存在しないのでinsert時に外部キーを解決できずエラーとなる
         // そのためtagなしでnew{}し、その後Entityをupdateするような書き方をすることで、KnowhowsTagsにinsertされる
-        knowhowEntity.tags = TagEntity.forIds(tags)
+        knowhowEntity.tags = TagEntity.forIds(tagIds)
 
         return knowhowEntity.toKnowhow()
     }

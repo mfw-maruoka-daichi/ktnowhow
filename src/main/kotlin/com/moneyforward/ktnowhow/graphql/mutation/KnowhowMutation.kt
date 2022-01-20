@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class KnowhowMutation(private val knowhowService: KnowhowService) : Mutation {
+    // todo authorIdはリクエストの認証情報から取得すべき(簡略化のためとりあえず)
     fun addKnowhow(title: String, url: String, authorId: ID, tagIds: List<ID>? = null): KnowhowType =
         knowhowService.addKnowhow(title, url, authorId, tagIds)
 
