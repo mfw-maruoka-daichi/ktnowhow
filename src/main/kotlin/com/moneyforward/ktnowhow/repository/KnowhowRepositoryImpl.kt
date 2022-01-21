@@ -1,12 +1,13 @@
 package com.moneyforward.ktnowhow.repository
 
 import com.moneyforward.ktnowhow.db.entity.KnowhowEntity
-import com.moneyforward.ktnowhow.db.entity.TagEntity
-import com.moneyforward.ktnowhow.db.entity.UserEntity
+import com.moneyforward.ktnowhow.db.table.Knowhows
+import com.moneyforward.ktnowhow.db.table.KnowhowsTags
 import com.moneyforward.ktnowhow.db.table.Tags
 import com.moneyforward.ktnowhow.model.Knowhow
-import org.jetbrains.exposed.dao.exceptions.EntityNotFoundException
-import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -14,23 +15,26 @@ class KnowhowRepositoryImpl : KnowhowRepository {
     override fun getAll(): List<Knowhow> = KnowhowEntity.all().map { it.toKnowhow() }
 
     override fun addKnowhow(title: String, url: String, authorId: Long, tagIds: List<Long>): Knowhow {
-        val tagEntities = TagEntity.forIds(tagIds)
-        if (tagEntities.count() != tagIds.size.toLong()) {
-            val diff = tagIds.subtract(tagEntities.map { it.id.value }.toSet()).first()
-            throw EntityNotFoundException(EntityID(diff, Tags), TagEntity)
+        val existentIds =
+            Tags.slice(Tags.id).select { Tags.id.inList(tagIds) }.map { it[Tags.id] }
+
+        if (existentIds.size != tagIds.size) {
+            val diff = tagIds.subtract(existentIds.map { it.value }.toSet())
+            throw IllegalArgumentException("Tag.id:$diff not exist")
         }
 
-        val knowhowEntity = KnowhowEntity.new {
-            this.title = title
-            this.url = url
-            this.author = UserEntity[authorId]
+        val knowhowId = Knowhows.insertAndGetId {
+            it[this.title] = title
+            it[this.url] = url
+            it[this.authorId] = authorId
         }
 
-        // knowhowEntityを一度insertしたあとにtagsに設定しないと、Knowhows.idが存在しないのでinsert時に外部キーを解決できずエラーとなる
-        // そのためtagなしでnew{}し、その後Entityをupdateするような書き方をすることで、KnowhowsTagsにinsertされる
-        knowhowEntity.tags = tagEntities
+        KnowhowsTags.batchInsert(tagIds) {
+            this[KnowhowsTags.knowhowId] = knowhowId
+            this[KnowhowsTags.tagId] = it
+        }
 
-        return knowhowEntity.toKnowhow()
+        return KnowhowEntity.findById(knowhowId)!!.toKnowhow()
     }
 }
 
