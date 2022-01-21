@@ -10,8 +10,7 @@ import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import org.apache.commons.logging.LogFactory
-import org.jetbrains.exposed.dao.exceptions.EntityNotFoundException
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -75,7 +74,7 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
                 it("failure") {
                     it("when user does not exist") {
                         transaction {
-                            shouldThrowExactly<EntityNotFoundException> {
+                            shouldThrowExactly<ExposedSQLException> {
                                 knowhowRepository.addKnowhow(
                                     "Knowhow sample",
                                     "dummy URL",
@@ -83,21 +82,20 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
                                     tags.map { it.id }
                                 )
                             }
+                            rollback()
                         }
                     }
                     it("when tags include tag witch does not exists") {
                         transaction {
-                            shouldThrowExactly<EntityNotFoundException> {
+                            shouldThrowExactly<ExposedSQLException> {
                                 knowhowRepository.addKnowhow(
                                     "Knowhow sample",
                                     "dummy URL",
                                     author.id,
                                     tags.map { it.id } + 4
                                 )
-                            }.let {
-                                val logger = LogFactory.getLog(KnowhowRepositoryImplTest::class.java)
-                                logger.info(it.message)
                             }
+                            rollback()
                         }
                     }
                 }
