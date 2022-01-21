@@ -8,6 +8,7 @@ import com.moneyforward.ktnowhow.graphql.type.TagType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.model.Knowhow
 import com.moneyforward.ktnowhow.repository.KnowhowRepository
+import com.moneyforward.ktnowhow.service.annotation.Transactional
 import org.reactivestreams.Publisher
 import org.springframework.stereotype.Service
 
@@ -16,6 +17,7 @@ class KnowhowServiceImpl(
     private val knowhowRepository: KnowhowRepository
 ) : KnowhowService {
 
+    @Transactional
     override fun getAllKnowhow(): List<KnowhowType> =
         knowhowRepository.getAll().map { it.toKnowhowType() }
 
@@ -35,6 +37,7 @@ class KnowhowServiceImpl(
         TODO("Not yet implemented")
     }
 
+    @Transactional
     override fun addKnowhow(title: String, url: String, authorId: ID, tagIds: List<ID>?): KnowhowType {
         val authorRawId = authorId.getRawId(UserType::class)
             ?: throw IllegalArgumentException("invalid author ID: $authorId")

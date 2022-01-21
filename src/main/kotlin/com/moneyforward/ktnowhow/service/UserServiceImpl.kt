@@ -9,8 +9,8 @@ import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.model.UserInput
 import com.moneyforward.ktnowhow.repository.UserRepository
+import com.moneyforward.ktnowhow.service.annotation.Transactional
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserServiceImpl(

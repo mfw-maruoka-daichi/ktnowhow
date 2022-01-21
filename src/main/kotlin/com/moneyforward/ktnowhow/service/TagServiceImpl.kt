@@ -3,8 +3,8 @@ package com.moneyforward.ktnowhow.service
 import com.moneyforward.ktnowhow.graphql.type.TagType
 import com.moneyforward.ktnowhow.model.Tag
 import com.moneyforward.ktnowhow.repository.TagRepository
+import com.moneyforward.ktnowhow.service.annotation.Transactional
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TagServiceImpl(
