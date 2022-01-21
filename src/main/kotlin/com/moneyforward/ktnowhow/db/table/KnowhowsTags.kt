@@ -3,7 +3,7 @@ package com.moneyforward.ktnowhow.db.table
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 
-// TableでknowhowIdとtagIdの複合主キーにすると、ExposedだとEntity作れないのでLongIdTableにしておく
+// TableでknowhowIdとtagIdの複合主キーにすると、ExposedだとEntity作れない
 // https://github.com/JetBrains/Exposed/issues/964
 object KnowhowsTags : LongIdTable("knowhows_tags") {
     val knowhowId = reference(
@@ -19,4 +19,6 @@ object KnowhowsTags : LongIdTable("knowhows_tags") {
         onUpdate = ReferenceOption.CASCADE,
         onDelete = ReferenceOption.CASCADE
     ).index("idx_tag_id")
+
+    override val primaryKey = PrimaryKey(knowhowId, tagId)
 }
