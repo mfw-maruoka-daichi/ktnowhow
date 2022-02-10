@@ -64,6 +64,9 @@ exposedCodeGeneratorConfig {
     connectionURL = "jdbc:h2:~/.h2/ktnowhow"
     user = "sa"
     password = ""
+    outputDirectory = objects.directoryProperty().convention(
+        project.layout.projectDirectory.dir("src/main/kotlin/com/moneyforward/ktnowhow/db/generate")
+    )
 }
 
 tasks.generateExposedCode {
