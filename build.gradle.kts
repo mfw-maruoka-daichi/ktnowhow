@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
+    id("com.jetbrains.exposed.gradle.plugin") version "0.2.1"
 }
 
 group = "com.moneyforward"
@@ -56,4 +57,16 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+exposedCodeGeneratorConfig {
+    configFilename = "exposed_generate_config.yml"
+    connectionURL = "jdbc:h2:~/.h2/ktnowhow"
+    user = "sa"
+    password = ""
+}
+
+tasks.generateExposedCode {
+    // 自動生成ファイルの上書きしないようなので
+    dependsOn("clean")
 }
