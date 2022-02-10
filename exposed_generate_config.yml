@@ -1,1 +1,3 @@
 generateSingleFile: false
+packageName: com.moneyforward.ktnowhow.db.table
+

@@ -65,7 +65,7 @@ exposedCodeGeneratorConfig {
     user = "sa"
     password = ""
     outputDirectory = objects.directoryProperty().convention(
-        project.layout.projectDirectory.dir("src/main/kotlin/com/moneyforward/ktnowhow/db/generate")
+        project.layout.projectDirectory.dir("src/main/kotlin")
     )
 }
 

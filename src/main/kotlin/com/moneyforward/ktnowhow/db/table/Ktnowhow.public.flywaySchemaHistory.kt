@@ -1,3 +1,5 @@
+package com.moneyforward.ktnowhow.db.table
+
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
