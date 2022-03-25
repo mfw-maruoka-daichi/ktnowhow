@@ -14,7 +14,7 @@ sealed class User {
             returns(true) implies (this@User is DefinedUser)
             returns(false) implies (this@User is UndefinedUser)
         }
-        return id.isDefined()
+        return id.isDefined
     }
 }
 
