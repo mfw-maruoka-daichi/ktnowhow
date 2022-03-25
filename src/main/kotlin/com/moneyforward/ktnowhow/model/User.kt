@@ -30,5 +30,5 @@ data class DefinedUser(
     override val name: String,
     override val iconUrl: String?
 ) : User() {
-    override val id: DefinedID = DefinedID(rawId)
+    override val id: DefinedID<Long> = DefinedID(rawId)
 }
