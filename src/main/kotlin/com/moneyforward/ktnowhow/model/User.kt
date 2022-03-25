@@ -12,10 +12,11 @@ data class User<T : ID>(
     fun isIDDefined(): Boolean {
         contract {
             // compile error:: Cannot check for instance of erased type: User<DefinedID>
-            returns(true) implies (this@User is User<DefinedID>)
+            returns(true) implies (this@User is User<DefinedID<T>>)
             // compile error:: Cannot check for instance of erased type: User<UndefinedID>
             returns(false) implies (this@User is User<UndefinedID>)
         }
-        return id.isDefined()
+
+        return id.isDefined
     }
 }
