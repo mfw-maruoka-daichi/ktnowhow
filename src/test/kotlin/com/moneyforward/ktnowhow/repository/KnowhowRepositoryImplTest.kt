@@ -5,6 +5,7 @@ import com.moneyforward.ktnowhow.db.table.Knowhows
 import com.moneyforward.ktnowhow.db.table.KnowhowsTags
 import com.moneyforward.ktnowhow.db.table.Tags
 import com.moneyforward.ktnowhow.db.table.Users
+import com.moneyforward.ktnowhow.model.UndefinedUser
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.DescribeSpec
@@ -44,7 +45,7 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
     private val tagRepository = TagRepositoryImpl()
     private val knowhowRepository = KnowhowRepositoryImpl()
 
-    private val author by lazy { transaction { userRepository.createUser("user1") } }
+    private val author by lazy { transaction { userRepository.upsertUser(UndefinedUser("user1", null)) } }
     private val tags by lazy { transaction { tagRepository.createTags(listOf("tag1", "tag2", "tag3")) } }
 
     init {
@@ -60,7 +61,7 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
                         knowhowRepository.addKnowhow(
                             "Knowhow sample",
                             "dummy URL",
-                            author.id,
+                            author.rawId,
                             tags.map { it.id }
                         )
                     }
@@ -91,7 +92,7 @@ class KnowhowRepositoryImplTest : DescribeSpec() {
                                 knowhowRepository.addKnowhow(
                                     "Knowhow sample",
                                     "dummy URL",
-                                    author.id,
+                                    author.rawId,
                                     tags.map { it.id } + 4
                                 )
                             }

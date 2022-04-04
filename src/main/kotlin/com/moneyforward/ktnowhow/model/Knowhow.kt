@@ -4,6 +4,6 @@ data class Knowhow(
     val id: Long,
     val title: String,
     val url: String,
-    val author: User,
+    val author: DefinedUser,
     val tags: List<Tag>
 )

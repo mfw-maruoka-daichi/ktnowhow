@@ -42,7 +42,7 @@ class UserRepositoryImplTest : ExpectSpec() {
             }
             expect("user found") {
                 transaction {
-                    userRepository.findUserBy(1L)?.id shouldBe 1L
+                    userRepository.findUserBy(1L)?.rawId shouldBe 1L
                 }
             }
             expect("update user") {
@@ -61,8 +61,10 @@ class UserRepositoryImplTest : ExpectSpec() {
                 }
             }
             expect("user not found on update") {
-                transaction {
-                    userRepository.upsertUser(DefinedUser(2L, "", null)) shouldBe null
+                shouldThrow<IllegalStateException> {
+                    transaction {
+                        userRepository.upsertUser(DefinedUser(2L, "", null))
+                    }
                 }
             }
             expect("user not found on delete") {
