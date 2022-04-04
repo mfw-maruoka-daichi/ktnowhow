@@ -12,8 +12,7 @@ class UserRepositoryImpl : UserRepository {
         UserEntity.findById(id)?.toUser()
 
     override fun upsertUser(user: User): DefinedUser {
-        return if (user.isIDDefined()) updateUser(user)
-        else createUser(user)
+        return if (user.isIdDefined()) updateUser(user) else createUser(user)
     }
 
     private fun createUser(user: UndefinedUser): DefinedUser = UserEntity.new {
@@ -24,7 +23,7 @@ class UserRepositoryImpl : UserRepository {
     private fun updateUser(user: DefinedUser): DefinedUser = UserEntity.findById(user.id.value)?.apply {
         user.name.let { name = it }
         user.iconUrl.let { iconUrl = it }
-    }?.toUser() ?: throw IllegalStateException("${user.id} not found")
+    }?.toUser() ?: throw IllegalStateException("user.id=${user.id} not found")
 
     override fun deleteUser(id: Long): Long? =
         UserEntity.findById(id)?.apply {

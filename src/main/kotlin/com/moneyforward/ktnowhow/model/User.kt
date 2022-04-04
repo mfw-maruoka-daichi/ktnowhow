@@ -9,7 +9,7 @@ sealed class User {
     abstract val iconUrl: String?
 
     @OptIn(ExperimentalContracts::class)
-    fun isIDDefined(): Boolean {
+    fun isIdDefined(): Boolean {
         contract {
             returns(true) implies (this@User is DefinedUser)
             returns(false) implies (this@User is UndefinedUser)
