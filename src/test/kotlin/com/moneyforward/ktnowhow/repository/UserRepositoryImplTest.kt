@@ -2,8 +2,8 @@ package com.moneyforward.ktnowhow.repository
 
 import com.moneyforward.ktnowhow.db.H2TestDatabase
 import com.moneyforward.ktnowhow.db.table.Users
-import com.moneyforward.ktnowhow.model.User
-import com.moneyforward.ktnowhow.model.UserInput
+import com.moneyforward.ktnowhow.model.DefinedUser
+import com.moneyforward.ktnowhow.model.UndefinedUser
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ExpectSpec
@@ -36,23 +36,24 @@ class UserRepositoryImplTest : ExpectSpec() {
         context("normal") {
             expect("create user") {
                 transaction {
-                    userRepository.createUser("sampleUser") shouldBe User(1L, "sampleUser", null)
+                    userRepository.upsertUser(UndefinedUser("sampleUser", null)) shouldBe
+                        DefinedUser(1L, "sampleUser", null)
                 }
             }
             expect("user found") {
                 transaction {
-                    userRepository.findUserBy(1L)?.id shouldBe 1L
+                    userRepository.findUserBy(1L)?.rawId shouldBe 1L
                 }
             }
             expect("update user") {
                 transaction {
-                    userRepository.updateUser(
-                        UserInput(
+                    userRepository.upsertUser(
+                        DefinedUser(
                             1L,
                             "testUser",
                             "https://1.bp.blogspot.com/-rICfj66reA8/YJRppE8IMRI/AAAAAAABdsI/fkiIy_6KHAYUYVtWP1wPrtU7h6_UKDgXQCNcBGAsYHQ/s751/drink_beer_bin.png"
                         )
-                    ) shouldBe User(
+                    ) shouldBe DefinedUser(
                         1L,
                         "testUser",
                         "https://1.bp.blogspot.com/-rICfj66reA8/YJRppE8IMRI/AAAAAAABdsI/fkiIy_6KHAYUYVtWP1wPrtU7h6_UKDgXQCNcBGAsYHQ/s751/drink_beer_bin.png"
@@ -60,8 +61,10 @@ class UserRepositoryImplTest : ExpectSpec() {
                 }
             }
             expect("user not found on update") {
-                transaction {
-                    userRepository.updateUser(UserInput(2L, "", null)) shouldBe null
+                shouldThrow<IllegalStateException> {
+                    transaction {
+                        userRepository.upsertUser(DefinedUser(2L, "", null))
+                    }
                 }
             }
             expect("user not found on delete") {

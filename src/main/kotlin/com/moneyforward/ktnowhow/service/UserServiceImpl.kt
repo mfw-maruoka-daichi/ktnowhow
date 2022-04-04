@@ -3,11 +3,12 @@ package com.moneyforward.ktnowhow.service
 import com.expediagroup.graphql.generator.scalars.ID
 import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 import com.moneyforward.ktnowhow.graphql.extension.id.toID
-import com.moneyforward.ktnowhow.graphql.type.UserInputType
+import com.moneyforward.ktnowhow.graphql.type.UserPropertyType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
+import com.moneyforward.ktnowhow.model.DefinedUser
+import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
-import com.moneyforward.ktnowhow.model.UserInput
 import com.moneyforward.ktnowhow.repository.UserRepository
 import com.moneyforward.ktnowhow.service.annotation.Transactional
 import org.springframework.stereotype.Service
@@ -24,17 +25,10 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun createUser(name: String, iconUrl: String?): UserType {
-        validateUserProperty(name, iconUrl)
-        return userRepository.createUser(name, iconUrl).toUserType()
-    }
+    override fun createUser(userProperty: UserPropertyType): UserType = upsertUser(userProperty.toUser())
 
     @Transactional
-    override fun updateUser(user: UserInputType): UserType {
-        user.validate()
-        return userRepository.updateUser(user.toUserInput())?.toUserType()
-            ?: throw IllegalStateException("${user.id} not found")
-    }
+    override fun updateUser(id: ID, userProperty: UserPropertyType): UserType = upsertUser(userProperty.toUser(id))
 
     @Transactional
     override fun deleteUser(id: ID): ID {
@@ -43,17 +37,28 @@ class UserServiceImpl(
             ?: throw IllegalStateException("$id not found")
     }
 
-    private fun UserInputType.toUserInput(): UserInput =
-        UserInput(
-            id = rawId ?: throw IllegalArgumentException("invalid ID"),
+    private fun upsertUser(user: User): UserType {
+        return userRepository.upsertUser(user).toUserType()
+    }
+
+    private fun UserPropertyType.toUser(id: ID? = null): User {
+        validate()
+        return id?.let {
+            DefinedUser(
+                rawId = it.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid ID"),
+                name = name,
+                iconUrl = iconUrl
+            )
+        } ?: UndefinedUser(
             name = name,
-            iconUrl = iconUrl,
+            iconUrl = iconUrl
         )
+    }
 }
 
-fun User.toUserType(): UserType =
+// todo どこか別のところで定義する
+fun DefinedUser.toUserType(): UserType =
     UserType(
-        rawId = id,
-        name = name,
-        iconUrl = iconUrl,
+        rawId = rawId,
+        UserPropertyType(name, iconUrl)
     )

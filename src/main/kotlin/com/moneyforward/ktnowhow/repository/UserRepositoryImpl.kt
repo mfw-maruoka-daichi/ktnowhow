@@ -1,26 +1,29 @@
 package com.moneyforward.ktnowhow.repository
 
 import com.moneyforward.ktnowhow.db.entity.UserEntity
+import com.moneyforward.ktnowhow.model.DefinedUser
+import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
-import com.moneyforward.ktnowhow.model.UserInput
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepositoryImpl : UserRepository {
-    override fun findUserBy(id: Long): User? =
+    override fun findUserBy(id: Long): DefinedUser? =
         UserEntity.findById(id)?.toUser()
 
-    override fun createUser(name: String, iconUrl: String?): User =
-        UserEntity.new {
-            this.name = name
-            this.iconUrl = iconUrl
-        }.toUser()
+    override fun upsertUser(user: User): DefinedUser {
+        return if (user.isIdDefined()) updateUser(user) else createUser(user)
+    }
 
-    override fun updateUser(user: UserInput): User? =
-        UserEntity.findById(user.id)?.apply {
-            user.name?.let { name = it }
-            user.iconUrl?.let { iconUrl = it }
-        }?.toUser()
+    private fun createUser(user: UndefinedUser): DefinedUser = UserEntity.new {
+        this.name = user.name
+        this.iconUrl = user.iconUrl
+    }.toUser()
+
+    private fun updateUser(user: DefinedUser): DefinedUser = UserEntity.findById(user.id.value)?.apply {
+        user.name.let { name = it }
+        user.iconUrl.let { iconUrl = it }
+    }?.toUser() ?: throw IllegalStateException("user.id=${user.id} not found")
 
     override fun deleteUser(id: Long): Long? =
         UserEntity.findById(id)?.apply {
@@ -28,8 +31,8 @@ class UserRepositoryImpl : UserRepository {
         }?.id?.value
 }
 
-fun UserEntity.toUser(): User = User(
-    id = id.value,
+fun UserEntity.toUser(): DefinedUser = DefinedUser(
+    rawId = id.value,
     name = name,
     iconUrl = iconUrl,
 )
