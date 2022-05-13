@@ -4,9 +4,11 @@ import com.expediagroup.graphql.generator.scalars.ID
 import com.expediagroup.graphql.server.operations.Query
 import com.moneyforward.ktnowhow.graphql.type.UserType
 import com.moneyforward.ktnowhow.service.UserService
+import graphql.relay.Connection
 import org.springframework.stereotype.Component
 
 @Component
 class UserQuery(private val userService: UserService) : Query {
+    fun users(first: Int, after: String): Connection<UserType> = userService.users(first, after)
     fun findUserById(id: ID): UserType? = userService.findUserById(id)
 }
