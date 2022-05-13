@@ -3,30 +3,25 @@ package com.moneyforward.ktnowhow.service
 import com.expediagroup.graphql.generator.scalars.ID
 import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 import com.moneyforward.ktnowhow.graphql.extension.id.toID
-import com.moneyforward.ktnowhow.graphql.type.UserPropertyType
-import com.moneyforward.ktnowhow.graphql.type.UserType
+import com.moneyforward.ktnowhow.graphql.type.*
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
 import com.moneyforward.ktnowhow.model.DefinedUser
 import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.repository.UserRepository
 import com.moneyforward.ktnowhow.service.annotation.Transactional
-import graphql.relay.Connection
-import graphql.relay.DefaultConnection
-import graphql.relay.DefaultPageInfo
-import graphql.relay.Edge
-import graphql.relay.PageInfo
+import graphql.relay.*
 import org.springframework.stereotype.Service
 
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository
 ) : UserService, UserValidation {
-    override fun users(first: Int, after: String): Connection<UserType> {
+    override fun users(first: Int, after: String): UserConnection {
+        // todo fetch data from repository and convert Connection
         val edges: List<Edge<UserType>> = emptyList()
         val pageInfo: PageInfo = DefaultPageInfo(null, null, false, false)
-        // todo fetch data from repository and convert Connection
-        return DefaultConnection(edges, pageInfo)
+        return DefaultConnection(edges, pageInfo).toConnection()
     }
 
     @Transactional
@@ -65,6 +60,13 @@ class UserServiceImpl(
             iconUrl = iconUrl
         )
     }
+
+    // todo UserConnection(Connection<UserType>)でよさそう
+    private fun Connection<UserType>.toConnection(): UserConnection =
+        UserConnection(
+            edges.map { UserEdge(it.node, it.cursor.value) },
+            pageInfo.let { PageInfoType(it.isHasPreviousPage, it.isHasNextPage) }
+        )
 }
 
 // todo どこか別のところで定義する
