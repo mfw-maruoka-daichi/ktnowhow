@@ -17,10 +17,37 @@ import org.springframework.stereotype.Service
 class UserServiceImpl(
     private val userRepository: UserRepository
 ) : UserService, UserValidation {
-    override fun users(first: Int, after: String): UserConnection {
-        // todo fetch data from repository and convert Connection
-        val edges: List<Edge<UserType>> = emptyList()
-        val pageInfo: PageInfo = DefaultPageInfo(null, null, false, false)
+    // todo implement last/before and hasPreviousPage
+    override fun users(first: Int, after: String?): UserConnection {
+        val limit = first + 1
+        val rawId = after?.let { ID(it).getRawId(UserType::class) }
+
+        fun fetchAllThenFilter(): List<DefinedUser> {
+            val allData = userRepository.getAll()
+            val cursorIndex = allData.indexOfFirst { it.rawId == rawId }
+            return allData.slice(cursorIndex + 1..cursorIndex + 1 + limit)
+        }
+
+        val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, limit) // fetchAllThenFilter()
+
+        var hasPages = false
+        val edges: List<Edge<UserType>> = fetchedData.mapIndexedNotNull { index, definedUser ->
+            if (index < limit) {
+                val type = definedUser.toUserType()
+                DefaultEdge(type, DefaultConnectionCursor(type.id.value))
+            } else {
+                hasPages = true
+                null
+            }
+        }
+
+        val pageInfo: PageInfo = DefaultPageInfo(
+            edges.firstOrNull()?.cursor,
+            edges.lastOrNull()?.cursor,
+            false,
+            hasPages
+        )
+
         return DefaultConnection(edges, pageInfo).toConnection()
     }
 

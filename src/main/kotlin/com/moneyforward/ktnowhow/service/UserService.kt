@@ -6,7 +6,7 @@ import com.moneyforward.ktnowhow.graphql.type.UserPropertyType
 import com.moneyforward.ktnowhow.graphql.type.UserType
 
 interface UserService {
-    fun users(first: Int, after: String): UserConnection
+    fun users(first: Int, after: String?): UserConnection
     fun findUserById(id: ID): UserType?
     fun createUser(userProperty: UserPropertyType): UserType
     fun updateUser(id: ID, userProperty: UserPropertyType): UserType
