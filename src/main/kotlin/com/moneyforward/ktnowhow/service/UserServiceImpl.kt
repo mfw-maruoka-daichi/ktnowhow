@@ -23,13 +23,7 @@ class UserServiceImpl(
         val limit = first + 1
         val rawId = after?.let { ID(it).getRawId(UserType::class) }
 
-        fun fetchAllThenFilter(): List<DefinedUser> {
-            val allData = userRepository.getAll()
-            val cursorIndex = allData.indexOfFirst { it.rawId == rawId }
-            return allData.slice(cursorIndex + 1..cursorIndex + 1 + limit)
-        }
-
-        val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, limit) // fetchAllThenFilter()
+        val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, first + 1)
 
         var hasPages = false
         val edges: List<Edge<UserType>> = fetchedData.mapIndexedNotNull { index, definedUser ->
