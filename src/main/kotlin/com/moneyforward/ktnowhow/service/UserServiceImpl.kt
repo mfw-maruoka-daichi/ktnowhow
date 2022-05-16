@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 class UserServiceImpl(
     private val userRepository: UserRepository
 ) : UserService, UserValidation {
+    @Transactional
     // todo implement last/before and hasPreviousPage
     override fun users(first: Int, after: String?): UserConnection {
         val limit = first + 1
