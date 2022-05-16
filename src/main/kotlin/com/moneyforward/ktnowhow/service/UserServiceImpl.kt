@@ -20,14 +20,13 @@ class UserServiceImpl(
     @Transactional
     // todo implement last/before and hasPreviousPage
     override fun users(first: Int, after: String?): UserConnection {
-        val limit = first + 1
         val rawId = after?.let { ID(it).getRawId(UserType::class) }
 
         val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, first + 1)
 
         var hasPages = false
         val edges: List<Edge<UserType>> = fetchedData.mapIndexedNotNull { index, definedUser ->
-            if (index < limit) {
+            if (index < first) {
                 val type = definedUser.toUserType()
                 DefaultEdge(type, DefaultConnectionCursor(type.id.value))
             } else {
