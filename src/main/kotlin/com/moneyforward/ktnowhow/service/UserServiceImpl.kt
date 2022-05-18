@@ -9,6 +9,7 @@ import com.moneyforward.ktnowhow.model.DefinedUser
 import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.repository.UserRepository
+import com.moneyforward.ktnowhow.repository.common.SortOrder
 import com.moneyforward.ktnowhow.service.annotation.Transactional
 import graphql.relay.*
 import org.springframework.stereotype.Service
@@ -17,29 +18,50 @@ import org.springframework.stereotype.Service
 class UserServiceImpl(
     private val userRepository: UserRepository
 ) : UserService, UserValidation {
-    @Transactional
-    // todo implement last/before and hasPreviousPage
-    override fun users(first: Int, after: String?): UserConnection {
-        val rawId = after?.let { ID(it).getRawId(UserType::class) }
 
-        val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, first + 1)
+    @Transactional
+    override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection {
+
+        // todo validationで
+        when {
+            // first,lastの同時指定は不可 https://relay.dev/graphql/connections.htm#note-a97ec
+            first != null && last != null -> throw IllegalArgumentException()
+            // first/after(forward pagination), last/before(backward pagination)の組み合わせのみ許可
+            first != null && before != null || last != null && after != null -> throw IllegalArgumentException()
+            // fist,lastは負の数は許可しない
+            first != null && first < 0 || last != null && last < 0 -> throw IllegalArgumentException()
+        }
+
+        // first,lastどちらかは必須
+        val (limit, sortOnFetch) = first?.let { it to SortOrder.Asc }
+            ?: last?.let { it to SortOrder.Desc }
+            ?: throw IllegalArgumentException()
+
+        val rawId = after?.let { ID(it).getRawId(UserType::class) }
+            ?: before?.let { ID(it).getRawId(UserType::class) }
+            ?: let { if (sortOnFetch == SortOrder.Asc) 0L else Long.MAX_VALUE }
+
+        val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, limit + 1, sortOnFetch)
 
         var hasPages = false
         val edges: List<Edge<UserType>> = fetchedData.mapIndexedNotNull { index, definedUser ->
-            if (index < first) {
+            if (index < limit) {
                 val type = definedUser.toUserType()
                 DefaultEdge(type, DefaultConnectionCursor(type.id.value))
             } else {
                 hasPages = true
                 null
             }
-        }
+        }.let { if (sortOnFetch == SortOrder.Desc) it.reversed() else it }
 
+        // first/afterでのhasPreviousPage, last/beforeでのhasNextPageは常にfalseにする
+        // 効率的に判断できる場合のみでいい
+        // https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
         val pageInfo: PageInfo = DefaultPageInfo(
             edges.firstOrNull()?.cursor,
             edges.lastOrNull()?.cursor,
-            false,
-            hasPages
+            last?.let { hasPages } ?: false,
+            first?.let { hasPages } ?: false
         )
 
         return DefaultConnection(edges, pageInfo).toConnection()

@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserQuery(private val userService: UserService) : Query {
-    fun users(first: Int, after: String? = null): UserConnection = userService.users(first, after)
+    fun users(
+        first: Int? = null,
+        after: String? = null,
+        last: Int? = null,
+        before: String? = null
+    ): UserConnection = userService.users(first, after, last, before)
+
     fun findUserById(id: ID): UserType? = userService.findUserById(id)
 }
