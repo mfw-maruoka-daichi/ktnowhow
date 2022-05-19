@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserMutation(private val userService: UserService) : Mutation {
-    fun createUser(userPropertyType: UserPropertyType): UserType = userService.createUser(userPropertyType)
-    fun updateUser(id: ID, userPropertyType: UserPropertyType): UserType = userService.updateUser(id, userPropertyType)
+    fun createUser(userProperty: UserPropertyType): UserType = userService.createUser(userProperty)
+    fun updateUser(id: ID, userProperty: UserPropertyType): UserType = userService.updateUser(id, userProperty)
     fun deleteUser(id: ID): ID = userService.deleteUser(id)
 }
