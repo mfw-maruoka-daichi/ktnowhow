@@ -81,7 +81,14 @@ class UserServiceImpl(
     private fun RelayConnection<UserType>.toConnectionType(): UserConnection =
         UserConnection(
             edges.map { UserEdge(it.node, it.cursor.value) },
-            pageInfo.let { PageInfoType(it.isHasPreviousPage, it.isHasNextPage) }
+            pageInfo.let {
+                PageInfoType(
+                    it.startCursor?.value,
+                    it.endCursor?.value,
+                    it.isHasPreviousPage,
+                    it.isHasNextPage
+                )
+            }
         )
 }
 
