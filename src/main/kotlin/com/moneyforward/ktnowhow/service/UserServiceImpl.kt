@@ -1,17 +1,16 @@
 package com.moneyforward.ktnowhow.service
 
 import com.expediagroup.graphql.generator.scalars.ID
+import com.moneyforward.ktnowhow.common.PaginationDirection
 import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 import com.moneyforward.ktnowhow.graphql.extension.id.toID
 import com.moneyforward.ktnowhow.graphql.relay.Connection
-import com.moneyforward.ktnowhow.graphql.relay.PaginationDirection
 import com.moneyforward.ktnowhow.graphql.type.*
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
 import com.moneyforward.ktnowhow.model.DefinedUser
 import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.repository.UserRepository
-import com.moneyforward.ktnowhow.repository.common.SortOrder
 import com.moneyforward.ktnowhow.service.annotation.Transactional
 import org.springframework.stereotype.Service
 import graphql.relay.Connection as RelayConnection
@@ -23,21 +22,28 @@ class UserServiceImpl(
 
     @Transactional
     override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection {
-        fun fetch(cursor: ID?, limit: Int, direction: PaginationDirection): List<DefinedUser> {
-            val (sortOrder, fallbackRawId) = when (direction) {
-                PaginationDirection.Forward -> SortOrder.Asc to 0L
-                PaginationDirection.Backward -> SortOrder.Desc to Long.MAX_VALUE
+        fun fetch(cursor: ID?, pageSize: Int, direction: PaginationDirection): Connection.FetchResult<UserType> {
+            val rawId = cursor?.getRawId(UserType::class) ?: when (direction) {
+                PaginationDirection.Forward -> 0L
+                PaginationDirection.Backward -> Long.MAX_VALUE
             }
-            val rawId = cursor?.getRawId(UserType::class) ?: fallbackRawId
 
-            return userRepository.fetch(rawId, limit, sortOrder)
+            val users = userRepository.fetch(rawId, pageSize + 1, direction)
+
+            val hasMore = users.size > pageSize
+            val nodes = if (hasMore) {
+                when (direction) {
+                    PaginationDirection.Forward -> users.dropLast(1)
+                    PaginationDirection.Backward -> users.drop(1)
+                }
+            } else {
+                users
+            }.map { it.toUserType() }
+
+            return Connection.FetchResult(nodes, hasMore)
         }
 
-        fun convert(user: DefinedUser): UserType {
-            return user.toUserType()
-        }
-
-        return Connection(first, after, last, before, ::fetch, ::convert).toConnectionType()
+        return Connection(first, after, last, before, ::fetch).toConnectionType()
     }
 
     @Transactional

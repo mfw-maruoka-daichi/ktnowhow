@@ -1,17 +1,17 @@
 package com.moneyforward.ktnowhow.graphql.relay
 
 import com.expediagroup.graphql.generator.scalars.ID
+import com.moneyforward.ktnowhow.common.PaginationDirection
 import com.moneyforward.ktnowhow.graphql.type.Type
 import graphql.relay.*
 import graphql.relay.Connection as RelayConnection
 
-class Connection<T : Type, E>(
+class Connection<T : Type>(
     private val first: Int?,
     private val after: String?,
     private val last: Int?,
     private val before: String?,
-    private val fetcher: (cursor: ID?, limit: Int, direction: PaginationDirection) -> List<E>,
-    private val converter: (data: E) -> T
+    private val fetcher: (cursor: ID?, pageSize: Int, direction: PaginationDirection) -> FetchResult<T>,
 ) : RelayConnection<T> {
 
     private val pageSize: Int
@@ -39,17 +39,10 @@ class Connection<T : Type, E>(
 
     override fun getEdges(): List<Edge<T>> {
         val cursor = after?.let { ID(it) } ?: before?.let { ID(it) }
+        val fetched = fetcher(cursor, pageSize, direction)
 
-        val edges = fetcher(cursor, pageSize + 1, direction).mapIndexedNotNull { index, data ->
-            if (index < pageSize) {
-                converter(data).let { DefaultEdge(it, DefaultConnectionCursor(it.id.value)) }
-            } else {
-                hasMorePages = true
-                null
-            }
-        }.let { if (direction == PaginationDirection.Backward) it.reversed() else it }
-
-        return edges
+        hasMorePages = fetched.hasMore
+        return fetched.nodes.map { DefaultEdge(it, DefaultConnectionCursor(it.id.value)) }
     }
 
     override fun getPageInfo(): PageInfo = DefaultPageInfo(
@@ -57,5 +50,10 @@ class Connection<T : Type, E>(
         edges.lastOrNull()?.cursor,
         last?.let { hasMorePages } ?: false,
         first?.let { hasMorePages } ?: false
+    )
+
+    data class FetchResult<T>(
+        val nodes: List<T>,
+        val hasMore: Boolean
     )
 }

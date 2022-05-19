@@ -1,4 +1,4 @@
-package com.moneyforward.ktnowhow.graphql.relay
+package com.moneyforward.ktnowhow.common
 
 sealed class PaginationDirection {
     object Forward : PaginationDirection()
