@@ -23,7 +23,9 @@ class UserServiceImpl(
     @Transactional
     override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection {
         fun fetch(cursor: ID?, pageSize: Int, direction: PaginationDirection): Connection.FetchResult<UserType> {
-            val rawId = cursor?.getRawId(UserType::class) ?: when (direction) {
+            val rawId = cursor?.let {
+                it.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid cursor: ${it.value}")
+            } ?: when (direction) {
                 PaginationDirection.Forward -> 0L
                 PaginationDirection.Backward -> Long.MAX_VALUE
             }
