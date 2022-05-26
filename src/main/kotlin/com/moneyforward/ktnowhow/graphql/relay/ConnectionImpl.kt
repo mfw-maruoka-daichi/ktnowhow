@@ -4,15 +4,14 @@ import com.expediagroup.graphql.generator.scalars.ID
 import com.moneyforward.ktnowhow.common.PaginationDirection
 import com.moneyforward.ktnowhow.graphql.type.Type
 import graphql.relay.*
-import graphql.relay.Connection as RelayConnection
 
-class Connection<T : Type>(
+class ConnectionImpl<T : Type>(
     private val first: Int?,
     private val after: String?,
     private val last: Int?,
     private val before: String?,
     private val fetcher: (cursor: ID?, pageSize: Int, direction: PaginationDirection) -> FetchResult<T>,
-) : RelayConnection<T> {
+) : Connection<T> {
 
     private val pageSize: Int
     private val direction: PaginationDirection

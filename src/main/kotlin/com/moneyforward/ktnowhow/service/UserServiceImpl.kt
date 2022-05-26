@@ -4,7 +4,7 @@ import com.expediagroup.graphql.generator.scalars.ID
 import com.moneyforward.ktnowhow.common.PaginationDirection
 import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 import com.moneyforward.ktnowhow.graphql.extension.id.toID
-import com.moneyforward.ktnowhow.graphql.relay.Connection
+import com.moneyforward.ktnowhow.graphql.relay.ConnectionImpl
 import com.moneyforward.ktnowhow.graphql.type.*
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
 import com.moneyforward.ktnowhow.model.DefinedUser
@@ -12,8 +12,8 @@ import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.repository.UserRepository
 import com.moneyforward.ktnowhow.service.annotation.Transactional
+import graphql.relay.Connection
 import org.springframework.stereotype.Service
-import graphql.relay.Connection as RelayConnection
 
 @Service
 class UserServiceImpl(
@@ -22,7 +22,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection {
-        fun fetch(cursor: ID?, pageSize: Int, direction: PaginationDirection): Connection.FetchResult<UserType> {
+        fun fetch(cursor: ID?, pageSize: Int, direction: PaginationDirection): ConnectionImpl.FetchResult<UserType> {
             val rawId = cursor?.let {
                 it.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid cursor: ${it.value}")
             } ?: when (direction) {
@@ -42,10 +42,10 @@ class UserServiceImpl(
                 users
             }.map { it.toUserType() }
 
-            return Connection.FetchResult(nodes, hasMore)
+            return ConnectionImpl.FetchResult(nodes, hasMore)
         }
 
-        return Connection(first, after, last, before, ::fetch).toConnectionType()
+        return ConnectionImpl(first, after, last, before, ::fetch).toConnectionType()
     }
 
     @Transactional
@@ -86,7 +86,7 @@ class UserServiceImpl(
     }
 
     // todo UserConnection(Connection<UserType>)でよさそう
-    private fun RelayConnection<UserType>.toConnectionType(): UserConnection =
+    private fun Connection<UserType>.toConnectionType(): UserConnection =
         UserConnection(
             edges.map { UserEdge(it.node, it.cursor.value) },
             pageInfo.let {
