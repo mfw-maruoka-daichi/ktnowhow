@@ -1,17 +1,18 @@
 package com.moneyforward.ktnowhow.service
 
 import com.expediagroup.graphql.generator.scalars.ID
+import com.moneyforward.ktnowhow.common.PaginationDirection
 import com.moneyforward.ktnowhow.graphql.extension.id.getRawId
 import com.moneyforward.ktnowhow.graphql.extension.id.toID
+import com.moneyforward.ktnowhow.graphql.relay.ConnectionImpl
 import com.moneyforward.ktnowhow.graphql.type.*
 import com.moneyforward.ktnowhow.graphql.type.validation.UserValidation
 import com.moneyforward.ktnowhow.model.DefinedUser
 import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
 import com.moneyforward.ktnowhow.repository.UserRepository
-import com.moneyforward.ktnowhow.repository.common.SortOrder
 import com.moneyforward.ktnowhow.service.annotation.Transactional
-import graphql.relay.*
+import graphql.relay.Connection
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,50 +22,30 @@ class UserServiceImpl(
 
     @Transactional
     override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection {
+        fun fetch(cursor: ID?, pageSize: Int, direction: PaginationDirection): ConnectionImpl.FetchResult<UserType> {
+            val rawId = cursor?.let {
+                it.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid cursor: ${it.value}")
+            } ?: when (direction) {
+                PaginationDirection.Forward -> 0L
+                PaginationDirection.Backward -> Long.MAX_VALUE
+            }
 
-        // todo validationで
-        when {
-            // first,lastの同時指定は不可 https://relay.dev/graphql/connections.htm#note-a97ec
-            first != null && last != null -> throw IllegalArgumentException()
-            // first/after(forward pagination), last/before(backward pagination)の組み合わせのみ許可
-            first != null && before != null || last != null && after != null -> throw IllegalArgumentException()
-            // fist,lastは負の数は許可しない
-            first != null && first < 0 || last != null && last < 0 -> throw IllegalArgumentException()
+            val users = userRepository.fetch(rawId, pageSize + 1, direction)
+
+            val hasMore = users.size > pageSize
+            val nodes = if (hasMore) {
+                when (direction) {
+                    PaginationDirection.Forward -> users.dropLast(1)
+                    PaginationDirection.Backward -> users.drop(1)
+                }
+            } else {
+                users
+            }.map { it.toUserType() }
+
+            return ConnectionImpl.FetchResult(nodes, hasMore)
         }
 
-        // first,lastどちらかは必須
-        val (limit, sortOnFetch) = first?.let { it to SortOrder.Asc }
-            ?: last?.let { it to SortOrder.Desc }
-            ?: throw IllegalArgumentException()
-
-        val rawId = after?.let { ID(it).getRawId(UserType::class) }
-            ?: before?.let { ID(it).getRawId(UserType::class) }
-            ?: let { if (sortOnFetch == SortOrder.Asc) 0L else Long.MAX_VALUE }
-
-        val fetchedData: List<DefinedUser> = userRepository.fetch(rawId, limit + 1, sortOnFetch)
-
-        var hasPages = false
-        val edges: List<Edge<UserType>> = fetchedData.mapIndexedNotNull { index, definedUser ->
-            if (index < limit) {
-                val type = definedUser.toUserType()
-                DefaultEdge(type, DefaultConnectionCursor(type.id.value))
-            } else {
-                hasPages = true
-                null
-            }
-        }.let { if (sortOnFetch == SortOrder.Desc) it.reversed() else it }
-
-        // first/afterでのhasPreviousPage, last/beforeでのhasNextPageは常にfalseにする
-        // 効率的に判断できる場合のみでいい
-        // https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
-        val pageInfo: PageInfo = DefaultPageInfo(
-            edges.firstOrNull()?.cursor,
-            edges.lastOrNull()?.cursor,
-            last?.let { hasPages } ?: false,
-            first?.let { hasPages } ?: false
-        )
-
-        return DefaultConnection(edges, pageInfo).toConnection()
+        return ConnectionImpl(first, after, last, before, ::fetch).toConnectionType()
     }
 
     @Transactional
@@ -105,10 +86,17 @@ class UserServiceImpl(
     }
 
     // todo UserConnection(Connection<UserType>)でよさそう
-    private fun Connection<UserType>.toConnection(): UserConnection =
+    private fun Connection<UserType>.toConnectionType(): UserConnection =
         UserConnection(
             edges.map { UserEdge(it.node, it.cursor.value) },
-            pageInfo.let { PageInfoType(it.isHasPreviousPage, it.isHasNextPage) }
+            pageInfo.let {
+                PageInfoType(
+                    it.startCursor?.value,
+                    it.endCursor?.value,
+                    it.isHasPreviousPage,
+                    it.isHasNextPage
+                )
+            }
         )
 }
 
