@@ -21,8 +21,8 @@ class UserServiceImpl(
 ) : UserService, UserValidation {
 
     @Transactional
-    override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection {
-        fun fetch(cursor: ID?, pageSize: Int, direction: PaginationDirection): ConnectionImpl.FetchResult<UserType> {
+    override fun users(first: Int?, after: String?, last: Int?, before: String?): UserConnection =
+        ConnectionImpl(first, after, last, before) { cursor, pageSize, direction ->
             val rawId = cursor?.let {
                 it.getRawId(UserType::class) ?: throw IllegalArgumentException("invalid cursor: ${it.value}")
             } ?: when (direction) {
@@ -42,11 +42,8 @@ class UserServiceImpl(
                 users
             }.map { it.toUserType() }
 
-            return ConnectionImpl.FetchResult(nodes, hasMore)
-        }
-
-        return ConnectionImpl(first, after, last, before, ::fetch).toConnectionType()
-    }
+            ConnectionImpl.FetchResult(nodes, hasMore)
+        }.toConnectionType()
 
     @Transactional
     override fun findUserById(id: ID): UserType? {
