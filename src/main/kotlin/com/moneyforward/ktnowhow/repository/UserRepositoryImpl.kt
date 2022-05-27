@@ -6,6 +6,7 @@ import com.moneyforward.ktnowhow.db.table.Users
 import com.moneyforward.ktnowhow.model.DefinedUser
 import com.moneyforward.ktnowhow.model.UndefinedUser
 import com.moneyforward.ktnowhow.model.User
+import com.moneyforward.ktnowhow.model.isIdDefined
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository

@@ -6,16 +6,15 @@ import com.moneyforward.ktnowhow.graphql.type.Type
 import graphql.relay.*
 
 class ConnectionImpl<T : Type>(
-    private val first: Int?,
-    private val after: String?,
-    private val last: Int?,
-    private val before: String?,
-    private val fetcher: (cursor: ID?, pageSize: Int, direction: PaginationDirection) -> FetchResult<T>,
+    first: Int?,
+    after: String?,
+    last: Int?,
+    before: String?,
+    fetcher: (cursor: ID?, pageSize: Int, direction: PaginationDirection) -> FetchResult<T>,
 ) : Connection<T> {
 
-    private val pageSize: Int
-    private val direction: PaginationDirection
-    private var hasMorePages: Boolean = false
+    private val _edges: List<Edge<T>>
+    private val _pageInfo: PageInfo
 
     init {
         when {
@@ -32,24 +31,20 @@ class ConnectionImpl<T : Type>(
             ?: last?.let { it to PaginationDirection.Backward }
             ?: throw IllegalArgumentException() // todo message
 
-        this.pageSize = pageSize
-        this.direction = direction
-    }
-
-    override fun getEdges(): List<Edge<T>> {
         val cursor = after?.let { ID(it) } ?: before?.let { ID(it) }
         val fetched = fetcher(cursor, pageSize, direction)
 
-        hasMorePages = fetched.hasMore
-        return fetched.nodes.map { DefaultEdge(it, DefaultConnectionCursor(it.id.value)) }
+        _edges = fetched.nodes.map { DefaultEdge(it, DefaultConnectionCursor(it.id.value)) }
+        _pageInfo = DefaultPageInfo(
+            edges.firstOrNull()?.cursor,
+            edges.lastOrNull()?.cursor,
+            last?.let { fetched.hasMore } ?: false,
+            first?.let { fetched.hasMore } ?: false
+        )
     }
 
-    override fun getPageInfo(): PageInfo = DefaultPageInfo(
-        edges.firstOrNull()?.cursor,
-        edges.lastOrNull()?.cursor,
-        last?.let { hasMorePages } ?: false,
-        first?.let { hasMorePages } ?: false
-    )
+    override fun getEdges(): List<Edge<T>> = _edges
+    override fun getPageInfo(): PageInfo = _pageInfo
 
     data class FetchResult<T>(
         val nodes: List<T>,
