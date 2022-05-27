@@ -8,14 +8,23 @@ sealed class User {
     abstract val name: String
     abstract val iconUrl: String?
 
-    @OptIn(ExperimentalContracts::class)
-    fun isIdDefined(): Boolean {
-        contract {
-            returns(true) implies (this@User is DefinedUser)
-            returns(false) implies (this@User is UndefinedUser)
-        }
-        return id.isDefined
+//    @OptIn(ExperimentalContracts::class)
+//    fun isIdDefined(): Boolean {
+//        contract {
+//            returns(true) implies (this@User is DefinedUser)
+//            returns(false) implies (this@User is UndefinedUser)
+//        }
+//        return id.isDefined
+//    }
+}
+
+@OptIn(ExperimentalContracts::class)
+fun User.isIdDefined(): Boolean {
+    contract {
+        returns(true) implies (this@isIdDefined is DefinedUser)
+        returns(false) implies (this@isIdDefined is UndefinedUser)
     }
+    return id.isDefined
 }
 
 data class UndefinedUser(
