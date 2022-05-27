@@ -30,14 +30,13 @@ class ConnectionImpl<T : Type>(
         val (pageSize, direction) = first?.let { it to PaginationDirection.Forward }
             ?: last?.let { it to PaginationDirection.Backward }
             ?: throw IllegalArgumentException() // todo message
-
         val cursor = after?.let { ID(it) } ?: before?.let { ID(it) }
         val fetched = fetcher(cursor, pageSize, direction)
 
         _edges = fetched.nodes.map { DefaultEdge(it, DefaultConnectionCursor(it.id.value)) }
         _pageInfo = DefaultPageInfo(
-            edges.firstOrNull()?.cursor,
-            edges.lastOrNull()?.cursor,
+            _edges.firstOrNull()?.cursor,
+            _edges.lastOrNull()?.cursor,
             last?.let { fetched.hasMore } ?: false,
             first?.let { fetched.hasMore } ?: false
         )
